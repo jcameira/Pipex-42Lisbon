@@ -67,7 +67,7 @@ void	free_everything_bonus(t_pipe_bonus_info *info)
 {
 	int	i;
 
-	if (info->pid >= 0)
+	if (info->pid)
 		free(info->pid);
 	i = -1;
 	while (++i < info->cmd_num - 1)
