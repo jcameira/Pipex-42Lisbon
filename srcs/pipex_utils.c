@@ -6,7 +6,7 @@
 /*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/28 15:02:05 by jcameira          #+#    #+#             */
-/*   Updated: 2024/02/22 02:12:36 by jcameira         ###   ########.fr       */
+/*   Updated: 2024/02/22 11:29:45 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,13 @@ void	execute_cmd(t_pipe_info *info, char *path, char **cmd_args, char **envp)
 			&& !ft_strchr(path, '/')
 			&& !ft_strncmp(path + ft_strlen(path) - 3, ".sh", 3)
 			&& ft_strncmp(path, "./", 2)))
+	{
+		close_everything(info);
 		write_command_error(cmd_args);
+	}
 	if (access(path, X_OK) == -1)
 	{
+		close_everything(info);
 		free_cmds(cmd_args);
 		exit(126);
 	}

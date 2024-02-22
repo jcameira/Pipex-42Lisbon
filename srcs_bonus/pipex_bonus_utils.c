@@ -3,14 +3,38 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joao <joao@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 13:24:44 by jcameira          #+#    #+#             */
-/*   Updated: 2023/12/27 15:41:30 by joao             ###   ########.fr       */
+/*   Updated: 2024/02/22 13:39:45 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
+
+void	execute_cmd_bonus(t_pipe_bonus_info *info, char *path, char **cmd_args,
+			char **envp)
+{
+	if (!path || access(path, 0) || (!access(path, 0)
+			&& !ft_strchr(path, '/')
+			&& !ft_strncmp(path + ft_strlen(path) - 3, ".sh", 3)
+			&& ft_strncmp(path, "./", 2)))
+	{
+		close_everything_bonus(info);
+		write_command_error_bonus(info, cmd_args);
+	}
+	if (access(path, X_OK) == -1)
+	{
+		close_everything_bonus(info);
+		free_cmds(cmd_args);
+		exit(126);
+	}
+	if (execve(path, cmd_args, envp) < 0)
+	{
+		close_everything_bonus(info);
+		exit(1);
+	}
+}
 
 void	manage_dups(t_pipe_bonus_info *info, int child_num)
 {

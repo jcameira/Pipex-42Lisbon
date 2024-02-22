@@ -11,8 +11,8 @@ SRCS				=	split_pipex.c split_pipex_utils.c free.c \
 						error_handling.c pipex_utils.c #malloc.c
 SRCS_PATH			=	srcs/
 
-BONUS_SRCS			=	$(SRCS) pipex_bonus_utils.c pipex_files.c \
-						free_bonus.c
+BONUS_SRCS			=	pipex_bonus_utils.c pipex_files.c \
+						free_bonus.c error_handling_bonus.c
 BONUS_SRCS_PATH		=	srcs_bonus/
 
 MAIN				=	$(SRCS_PATH)pipex.c
@@ -33,19 +33,21 @@ TOTAL_SRCS          =   $(words $(SRCS))
 TOTAL_BONUS_SRCS    =   $(words $(BONUS_SRCS))
 TOTAL_OBJS          =   $(words $(wildcard $(OBJ_DIR)*))
 FILES				=	0
+BONUS_FILES			=	0
 
 $(OBJ_DIR)/%.o:		$(SRCS_PATH)%.c
 					@$(CC) $(CFLAGS) -c $< -o $@ && \
 					$(eval FILES=$(shell echo $$(($(FILES) + 1)))) \
-					$(call PRINT_PROGRESS,$(TOTAL_SRCS),$(GRN),$(YELLOW)Compiling$(DEFAULT) $@)
+					$(call PRINT_PROGRESS,$(TOTAL_SRCS),$(GRN),$(YELLOW)Compiling$(DEFAULT) $@, $(FILES))
+					
 
 $(OBJ_DIR)/%.o:		$(BONUS_SRCS_PATH)%.c
-					@if [ "$(FILES)" -eq "5" ]; then \
-    					printf "\033[1F\033[0K"; \
+					@if [ "$(BONUS_FILES)" -eq "0" ]; then \
+        				printf "\033[2F\033[0K]"; \
 					fi
 					@$(CC) $(CFLAGS) -c $< -o $@ && \
-					$(eval FILES=$(shell echo $$(($(FILES) + 1)))) \
-					$(call PRINT_PROGRESS,$(TOTAL_BONUS_SRCS),$(GRN),$(YELLOW)Compiling$(DEFAULT) $@)
+					$(eval BONUS_FILES=$(shell echo $$(($(BONUS_FILES) + 1)))) \
+					$(call PRINT_PROGRESS,$(TOTAL_BONUS_SRCS),$(GRN),$(YELLOW)Compiling$(DEFAULT) $@, $(BONUS_FILES))
 
 all:				$(NAME)
 
@@ -55,7 +57,7 @@ $(NAME):			$(OBJ_DIR) $(LIBFT) $(GNL) $(OBJS)
 					@if norminette | grep -q -v "OK!"; then \
 						norminette | grep -v "OK!"; echo "$(RED) Norminette has errors!$(DEFAULT)"; \
 					else \
-						echo "$(GREEN) Norminette OK!!$(DEFAULT)"; \
+						echo "Norminette$(GRN) OK!!$(DEFAULT)"; \
 					fi
 					$(eval FILES=0)
 
@@ -67,9 +69,17 @@ random_m:			$(OBJ_DIR) $(LIBFT) $(GNL) $(OBJS)
 					@$(CC) $(CFLAGS) $(SANITIZE) $(RANDOM_MALLOC) $(MAIN) $(ALL_OBJS) -o $(NAME)
 					@echo "\033[2F\033[0K$(CYAN)$(NAME)$(DEFAULT) successfully created\033[E"
 
-bonus:				fclean $(OBJ_DIR) $(LIBFT) $(GNL) $(OBJS) $(BONUS_OBJS)
+bonus:				$(OBJ_DIR) $(LIBFT) $(GNL) $(OBJS) $(BONUS_OBJS)
 					@$(CC) $(CFLAGS) $(BONUS_MAIN) $(ALL_OBJS) -o $(NAME)
 					@echo "\033[2F\033[0K$(CYAN)$(NAME)$(DEFAULT) bonus successfully created\033[E"
+
+sanitize_b:			$(OBJ_DIR) $(LIBFT) $(GNL) $(OBJS) $(BONUS_OBJS)
+					@$(CC) $(CFLAGS) $(SANITIZE) $(BONUS_MAIN) $(ALL_OBJS) -o $(NAME)
+					@echo "\033[2F\033[0K$(CYAN)$(NAME)$(DEFAULT) successfully created\033[E"
+
+random_m_b:			$(OBJ_DIR) $(LIBFT) $(GNL) $(OBJS) $(BONUS_OBJS)
+					@$(CC) $(CFLAGS) $(SANITIZE) $(RANDOM_MALLOC) $(BONUS_MAIN) $(ALL_OBJS) -o $(NAME)
+					@echo "\033[2F\033[0K$(CYAN)$(NAME)$(DEFAULT) successfully created\033[E"
 
 $(LIBFT):
 					@make -s -C $(LIBFT_PATH) all
@@ -83,7 +93,7 @@ $(OBJ_DIR):
 clean:
 					@$(foreach file,$(wildcard $(OBJ_DIR)*), \
 						$(eval FILES=$(shell echo $$(($(FILES) + 1)))) \
-						$(call PRINT_PROGRESS,$(TOTAL_OBJS),$(RED),$(YELLOW)Deleting$(DEFAULT) $(file)); \
+						$(call PRINT_PROGRESS,$(TOTAL_OBJS),$(RED),$(YELLOW)Deleting$(DEFAULT) $(file), $(FILES)); \
 						$(RM) $(file); \
 					)
 					@$(RM) $(OBJ_DIR)
@@ -106,19 +116,19 @@ re:					fclean all
 .PHONY:				all bonus clean fclean re bonus
 
 define PRINT_PROGRESS
-    if [ "$(FILES)" -eq "1" ]; then \
+    if [ "$(4)" -eq "1" ]; then \
         printf "\033[0K$(3)\n["; \
     else \
         printf "\033[0K\033[1F\033[0K$(3)\n["; \
     fi
-    @for i in `seq 1 $(shell expr $(FILES) \* 70 / $(1))`; do \
+    @for i in `seq 1 $(shell expr $(4) \* 70 / $(1))`; do \
         printf "$(2)=\033[0m"; \
     done
-    @for i in `seq 1 $(shell expr 70 - $(FILES) \* 70 / $(1))`; do \
+    @for i in `seq 1 $(shell expr 70 - $(4) \* 70 / $(1))`; do \
         printf " "; \
     done
-    @printf "] $(shell echo $$(($(FILES) * 100 / $(1))))%%"
-	if [ "$(FILES)" -eq "$(1)" ]; then \
+    @printf "] $(shell echo $$(($(4) * 100 / $(1))))%%"
+	if [ "$(4)" -eq "$(1)" ]; then \
         printf "\n"; \
 	fi
 endef

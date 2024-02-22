@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joao <joao@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/30 15:32:43 by jcameira          #+#    #+#             */
-/*   Updated: 2023/12/27 15:46:02 by joao             ###   ########.fr       */
+/*   Updated: 2024/02/22 11:40:32 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	child(t_pipe_bonus_info *info, char **argv,
 		path = ft_strjoin(DEFAULT_CMD_PATH, cmd_args[0]);
 	else
 		path = find_cmd_path(envp, cmd_args[0]);
-	execute_cmd(path, cmd_args, envp);
+	execute_cmd_bonus(info, path, cmd_args, envp);
 }
 
 void	start_childs(char **argv, char **envp, t_pipe_bonus_info *info)
