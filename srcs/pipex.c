@@ -6,7 +6,7 @@
 /*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 10:54:39 by jcameira          #+#    #+#             */
-/*   Updated: 2024/02/22 02:10:28 by jcameira         ###   ########.fr       */
+/*   Updated: 2024/02/22 16:22:53 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ int	main(int argc, char **argv, char **envp)
 	if (info.pid2 == 0)
 		parent(&info, argv, envp);
 	close_everything(&info);
+	waitpid(info.pid, NULL, 0);
 	waitpid(info.pid2, &status, 0);
 	return (WEXITSTATUS(status));
 }

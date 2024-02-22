@@ -6,7 +6,7 @@
 /*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/22 20:36:15 by jcameira          #+#    #+#             */
-/*   Updated: 2024/02/22 12:03:05 by jcameira         ###   ########.fr       */
+/*   Updated: 2024/02/22 16:11:29 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ void	close_everything_bonus(t_pipe_bonus_info *info)
 {
 	int	i;
 
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
 	if (info->infile_fd >= 0)
 		close(info->infile_fd);
 	if (info->outfile_fd >= 0)

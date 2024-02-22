@@ -6,7 +6,7 @@
 /*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/28 15:02:05 by jcameira          #+#    #+#             */
-/*   Updated: 2024/02/22 11:29:45 by jcameira         ###   ########.fr       */
+/*   Updated: 2024/02/22 16:21:31 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,12 @@ void	execute_cmd(t_pipe_info *info, char *path, char **cmd_args, char **envp)
 		close_everything(info);
 		write_command_error(cmd_args);
 	}
-	if (access(path, X_OK) == -1)
-	{
-		close_everything(info);
-		free_cmds(cmd_args);
-		exit(126);
-	}
 	if (execve(path, cmd_args, envp) < 0)
 	{
+		perror("execve");
 		close_everything(info);
-		exit(1);
+		free_cmds(cmd_args);
+		exit(errno);
 	}
 }
 

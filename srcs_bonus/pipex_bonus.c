@@ -6,7 +6,7 @@
 /*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/30 15:32:43 by jcameira          #+#    #+#             */
-/*   Updated: 2024/02/22 11:40:32 by jcameira         ###   ########.fr       */
+/*   Updated: 2024/02/22 16:24:30 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,16 +55,14 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_pipe_bonus_info	info;
 	int					status;
+	int					i;
 
-	if (argc < 5)
-		return (1);
+	if (argv[1] && !ft_strcmp(argv[1], "here_doc"))
+		info.here_doc = 1;
 	else
-	{
-		if (!ft_strcmp(argv[1], "here_doc"))
-			info.here_doc = 1;
-		else
-			info.here_doc = 0;
-	}
+		info.here_doc = 0;
+	if (argc < 5 + info.here_doc)
+		return (1);
 	get_infile(argv, &info);
 	get_outfile(argc, argv, &info);
 	info.cmd_num = argc - 3 - info.here_doc;
@@ -72,6 +70,9 @@ int	main(int argc, char **argv, char **envp)
 	get_pipes(&info);
 	start_childs(argv, envp, &info);
 	close_everything_bonus(&info);
+	i = -1;
+	while (++i < info.cmd_num - 1)
+		waitpid((info.pid)[i], NULL, 0);
 	waitpid((info.pid)[info.cmd_num - 1], &status, 0);
 	free_everything_bonus(&info);
 	return (WEXITSTATUS(status));

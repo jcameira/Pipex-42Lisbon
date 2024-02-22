@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_files.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joao <joao@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/22 18:03:05 by jcameira          #+#    #+#             */
-/*   Updated: 2023/12/27 18:07:39 by joao             ###   ########.fr       */
+/*   Updated: 2024/02/22 16:17:17 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,13 @@ void	here_doc_init(char *limiter, t_pipe_bonus_info *info)
 	{
 		ft_putstr_fd(HERE_DOC_INDICATOR, 1);
 		line = get_next_line(INPUT);
-		line = ft_strtrim(line, "\n");
+		if (!line)
+			break ;
+		if (line[ft_strlen(line) - 1] == '\n')
+			line[ft_strlen(line) - 1] = '\0';
 		if (!ft_strcmp(line, limiter))
 			break ;
-		ft_putstr_fd(line, fd);
-		ft_putchar_fd('\n', fd);
+		ft_putendl_fd(line, fd);
 		free(line);
 	}
 	free(line);
