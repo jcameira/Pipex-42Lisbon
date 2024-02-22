@@ -97,11 +97,10 @@ clean:
 						$(RM) $(file); \
 					)
 					@$(RM) $(OBJ_DIR)
+					@echo "\033[2F\033[0K$(PURPLE)$(OBJ_DIR)$(DEFAULT) deleted\033[E"
 					$(eval FILES=0)
 
 fclean:				clean
-					@$(RM) $(OBJ_DIR)
-					@echo "$(PURPLE)$(OBJ_DIR)$(DEFAULT) deleted"
 					@$(RM) $(LIBFT)
 					@echo "$(PURPLE)$(LIBFT)$(DEFAULT) deleted"
 					@$(RM) $(GNL)
