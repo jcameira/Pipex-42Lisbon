@@ -1,17 +1,14 @@
-GREEN = \033[1;32m
-RED = \033[1;31m
-DEFAULT = \033[0m
-
 NAME				=	pipex
-ARCHIVE_NAME		=	pipex.a
 
 CC					=	cc
 CFLAGS				=	-Wall -Wextra -Werror
+SANITIZE			=	-g -fsanitize=address,undefined
+RANDOM_MALLOC		=	-Xlinker --wrap=malloc
 AR					=	ar rcs
 RM					=	rm -rf
 
 SRCS				=	split_pipex.c split_pipex_utils.c free.c \
-						error_handling.c pipex_utils.c
+						error_handling.c pipex_utils.c #malloc.c
 SRCS_PATH			=	srcs/
 
 BONUS_SRCS			=	$(SRCS) pipex_bonus_utils.c pipex_files.c \
@@ -29,59 +26,106 @@ ALL_OBJS			=	objects/*.o
 
 LIBFT_PATH			=	libft
 LIBFT				=	$(LIBFT_PATH)/libft.a
-
 GNL_PATH			=	get_next_line
 GNL					=	$(GNL_PATH)/get_next_line.a
 
+TOTAL_SRCS          =   $(words $(SRCS))
+TOTAL_BONUS_SRCS    =   $(words $(BONUS_SRCS))
+TOTAL_OBJS          =   $(words $(wildcard $(OBJ_DIR)*))
+FILES				=	0
+
 $(OBJ_DIR)/%.o:		$(SRCS_PATH)%.c
-					@$(CC) $(CFLAGS) -c $< -o $@
+					@$(CC) $(CFLAGS) -c $< -o $@ && \
+					$(eval FILES=$(shell echo $$(($(FILES) + 1)))) \
+					$(call PRINT_PROGRESS,$(TOTAL_SRCS),$(GRN),$(YELLOW)Compiling$(DEFAULT) $@)
 
 $(OBJ_DIR)/%.o:		$(BONUS_SRCS_PATH)%.c
-					@$(CC) $(CFLAGS) -c $< -o $@
+					@if [ "$(FILES)" -eq "5" ]; then \
+    					printf "\033[1F\033[0K"; \
+					fi
+					@$(CC) $(CFLAGS) -c $< -o $@ && \
+					$(eval FILES=$(shell echo $$(($(FILES) + 1)))) \
+					$(call PRINT_PROGRESS,$(TOTAL_BONUS_SRCS),$(GRN),$(YELLOW)Compiling$(DEFAULT) $@)
 
 all:				$(NAME)
 
-$(NAME):			$(OBJ_DIR) $(OBJS) $(LIBFT) $(ARCHIVE_NAME)
+$(NAME):			$(OBJ_DIR) $(LIBFT) $(GNL) $(OBJS)
 					@$(CC) $(CFLAGS) $(MAIN) $(ALL_OBJS) -o $(NAME)
-					@echo "$(GREEN) $(NAME) executable created!$(DEFAULT)"
+					@echo "\033[2F\033[0K$(CYAN)$(NAME)$(DEFAULT) successfully created\033[E"
 					@if norminette | grep -q -v "OK!"; then \
-						norminette; echo "$(RED) Norminette has errors!$(DEFAULT)"; \
+						norminette | grep -v "OK!"; echo "$(RED) Norminette has errors!$(DEFAULT)"; \
 					else \
 						echo "$(GREEN) Norminette OK!!$(DEFAULT)"; \
 					fi
+					$(eval FILES=0)
 
-bonus:				$(OBJ_DIR) $(OBJS) $(BONUS_OBJS) $(LIBFT) $(GNL) $(ARCHIVE_NAME)
+sanitize:			$(OBJ_DIR) $(LIBFT) $(GNL) $(OBJS)
+					@$(CC) $(CFLAGS) $(SANITIZE) $(MAIN) $(ALL_OBJS) -o $(NAME)
+					@echo "\033[2F\033[0K$(CYAN)$(NAME)$(DEFAULT) successfully created\033[E"
+
+random_m:			$(OBJ_DIR) $(LIBFT) $(GNL) $(OBJS)
+					@$(CC) $(CFLAGS) $(SANITIZE) $(RANDOM_MALLOC) $(MAIN) $(ALL_OBJS) -o $(NAME)
+					@echo "\033[2F\033[0K$(CYAN)$(NAME)$(DEFAULT) successfully created\033[E"
+
+bonus:				fclean $(OBJ_DIR) $(LIBFT) $(GNL) $(OBJS) $(BONUS_OBJS)
 					@$(CC) $(CFLAGS) $(BONUS_MAIN) $(ALL_OBJS) -o $(NAME)
-					@echo "$(GREEN) $(NAME) bonus executable created!$(DEFAULT)"
-
-$(ARCHIVE_NAME):
-					@${AR} ${ARCHIVE_NAME} ${ALL_OBJS}
-					@echo "$(GREEN) Arquive for pipex created!$(DEFAULT)"
+					@echo "\033[2F\033[0K$(CYAN)$(NAME)$(DEFAULT) bonus successfully created\033[E"
 
 $(LIBFT):
 					@make -s -C $(LIBFT_PATH) all
-					@echo "$(GREEN) Arquive for libft created!$(DEFAULT)"
 
 $(GNL):
 					@make -s -C $(GNL_PATH) all
-					@echo "$(GREEN) Arquive for get_next_line created!$(DEFAULT)"
 
 $(OBJ_DIR):
 					@mkdir -p $(OBJ_DIR)
-					@echo "$(GREEN) $(OBJ_DIR) directory created!$(DEFAULT)"
 
 clean:
+					@$(foreach file,$(wildcard $(OBJ_DIR)*), \
+						$(eval FILES=$(shell echo $$(($(FILES) + 1)))) \
+						$(call PRINT_PROGRESS,$(TOTAL_OBJS),$(RED),$(YELLOW)Deleting$(DEFAULT) $(file)); \
+						$(RM) $(file); \
+					)
 					@$(RM) $(OBJ_DIR)
-					@echo "$(RED) All objects and objects diretory removed!$(DEFAULT)"
+					$(eval FILES=0)
 
 fclean:				clean
-					@$(RM) $(ARCHIVE_NAME)
-					@$(RM) $(NAME)
+					@$(RM) $(OBJ_DIR)
+					@echo "$(PURPLE)$(OBJ_DIR)$(DEFAULT) deleted"
 					@$(RM) $(LIBFT)
+					@echo "$(PURPLE)$(LIBFT)$(DEFAULT) deleted"
 					@$(RM) $(GNL)
-					@echo "$(RED) All arquives and executables removed!$(DEFAULT)"
+					@echo "$(PURPLE)$(GNL)$(DEFAULT) deleted"
+					@$(RM) $(FT_PRINTF)
+					@$(RM) $(NAME)
+					@echo "$(PURPLE)$(NAME)$(DEFAULT) deleted"
 
 re:					fclean all
 
 
 .PHONY:				all bonus clean fclean re bonus
+
+define PRINT_PROGRESS
+    if [ "$(FILES)" -eq "1" ]; then \
+        printf "\033[0K$(3)\n["; \
+    else \
+        printf "\033[0K\033[1F\033[0K$(3)\n["; \
+    fi
+    @for i in `seq 1 $(shell expr $(FILES) \* 70 / $(1))`; do \
+        printf "$(2)=\033[0m"; \
+    done
+    @for i in `seq 1 $(shell expr 70 - $(FILES) \* 70 / $(1))`; do \
+        printf " "; \
+    done
+    @printf "] $(shell echo $$(($(FILES) * 100 / $(1))))%%"
+	if [ "$(FILES)" -eq "$(1)" ]; then \
+        printf "\n"; \
+	fi
+endef
+
+CYAN				=	\033[36m
+PURPLE				=	\033[35m
+YELLOW				=	\033[33m
+GRN					=	\033[32m
+RED					=	\033[31m
+DEFAULT				=	\033[0m

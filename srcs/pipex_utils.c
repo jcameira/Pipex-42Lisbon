@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joao <joao@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/28 15:02:05 by jcameira          #+#    #+#             */
-/*   Updated: 2023/12/27 15:38:40 by joao             ###   ########.fr       */
+/*   Updated: 2024/02/22 02:12:36 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	execute_cmd(char *path, char **cmd_args, char **envp)
+void	execute_cmd(t_pipe_info *info, char *path, char **cmd_args, char **envp)
 {
 	if (!path || access(path, 0) || (!access(path, 0)
 			&& !ft_strchr(path, '/')
@@ -25,7 +25,10 @@ void	execute_cmd(char *path, char **cmd_args, char **envp)
 		exit(126);
 	}
 	if (execve(path, cmd_args, envp) < 0)
+	{
+		close_everything(info);
 		exit(1);
+	}
 }
 
 char	*write_command_path(char **cmd_paths, char *cmd)

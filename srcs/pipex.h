@@ -6,7 +6,7 @@
 /*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 10:55:26 by jcameira          #+#    #+#             */
-/*   Updated: 2023/12/22 20:49:03 by jcameira         ###   ########.fr       */
+/*   Updated: 2024/02/22 02:13:13 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ typedef struct s_pipe_info
 	char	*cmds[2];
 }	t_pipe_info;
 
-void	execute_cmd(char *path, char **cmd_args, char **envp);
+void	execute_cmd(t_pipe_info *info, char *path, char **cmd_args,
+			char **envp);
 char	*write_command_path(char **cmd_paths, char *cmd);
 char	*find_cmd_path(char **envp, char *cmd);
 char	**split_pipex(char const *str, char c);

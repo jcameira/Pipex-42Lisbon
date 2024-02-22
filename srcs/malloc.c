@@ -1,35 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free.c                                             :+:      :+:    :+:   */
+/*   malloc.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/26 14:09:36 by jcameira          #+#    #+#             */
-/*   Updated: 2024/02/22 02:16:30 by jcameira         ###   ########.fr       */
+/*   Created: 2024/02/20 00:45:31 by jcameira          #+#    #+#             */
+/*   Updated: 2024/02/20 00:45:32 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include <time.h>
+#include <stdlib.h>
 
-void	free_cmds(char **cmd_args)
+extern void	*__real_malloc(size_t size);
+
+void	*__wrap_malloc(size_t size)
 {
-	int	i;
-
-	i = 0;
-	while (cmd_args[i])
-		free(cmd_args[i++]);
-	free(cmd_args);
-}
-
-void	close_everything(t_pipe_info *info)
-{
-	if (info->pipe_ends[0] >= 0)
-		close(info->pipe_ends[0]);
-	if (info->pipe_ends[1] >= 0)
-		close(info->pipe_ends[1]);
-	if (info->infile_fd >= 0)
-		close(info->infile_fd);
-	if (info->infile_fd >= 0)
-		close(info->outfile_fd);
+	srand(time(NULL));
+	if (rand() % 2)
+		return (NULL);
+	return (__real_malloc(size));
 }
