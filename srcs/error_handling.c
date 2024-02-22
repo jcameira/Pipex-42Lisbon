@@ -6,11 +6,22 @@
 /*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 14:23:20 by jcameira          #+#    #+#             */
-/*   Updated: 2024/02/22 11:48:49 by jcameira         ###   ########.fr       */
+/*   Updated: 2024/02/22 20:52:33 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+void	execute_error(t_pipe_info *info, char **cmd_args)
+{
+	char	*error;
+
+	error = ft_strjoin(DEFAULT_ERROR_MSG_PREFIX, cmd_args[0]);
+	perror(error);
+	close_everything(info);
+	free_cmds(cmd_args);
+	free(error);
+}
 
 void	write_command_error(char **cmd_args)
 {

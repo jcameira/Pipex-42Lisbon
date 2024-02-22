@@ -6,7 +6,7 @@
 /*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 10:55:26 by jcameira          #+#    #+#             */
-/*   Updated: 2024/02/22 02:13:13 by jcameira         ###   ########.fr       */
+/*   Updated: 2024/02/22 20:36:42 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 # define COMMAND_ERROR_MSG ": command not found\n"
 # define EXIT_FAILURE 1
 # define EXIT_INCORRECT_USAGE 2
+# define EXIT_PERMISSION_DENIED 126
 # define EXIT_COMMAND_NOT_FOUND 127
 
 typedef struct s_pipe_info
@@ -55,5 +56,6 @@ void	free_cmds(char **cmd_args);
 void	close_everything(t_pipe_info *info);
 void	write_command_error(char **cmd_args);
 void	write_file_error(char **argv);
+void	execute_error(t_pipe_info *info, char **cmd_args);
 
 #endif

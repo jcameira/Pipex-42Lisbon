@@ -6,7 +6,7 @@
 /*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/30 15:32:43 by jcameira          #+#    #+#             */
-/*   Updated: 2024/02/22 16:24:30 by jcameira         ###   ########.fr       */
+/*   Updated: 2024/02/22 21:07:34 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,10 @@ void	child(t_pipe_bonus_info *info, char **argv,
 	char	**cmd_args;
 
 	if (child_num == 0)
+	{
 		if (info->infile_fd < 0)
 			write_file_error(argv);
+	}
 	close_unused_pipes(info, child_num);
 	manage_dups(info, child_num);
 	cmd_args = split_pipex((info->cmds)[child_num], ' ');
@@ -61,7 +63,7 @@ int	main(int argc, char **argv, char **envp)
 		info.here_doc = 1;
 	else
 		info.here_doc = 0;
-	if (argc < 5 + info.here_doc)
+	if (argc < DEFAULT_MIN_ARGS + info.here_doc)
 		return (1);
 	get_infile(argv, &info);
 	get_outfile(argc, argv, &info);
